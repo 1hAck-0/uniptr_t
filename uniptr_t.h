@@ -1,8 +1,6 @@
 #if !_UNIPTR_T_
 #define _UNIPTR_T_ 1
 
-#define _WINDOWS ((defined(WIN64) || _WIN64 || __WIN64 || defined(WIN32) || _WIN32 || __WIN32) && !__CYGWIN__)
-
 #if _MSC_VER
 #define ALWAYS_INLINE __forceinline
 #else
@@ -10,7 +8,7 @@
 #endif
 
 #include <cstdint>
-#if _WINDOWS
+#if ((defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(WIN32) || defined(_WIN32) || defined(__WIN32)) && !defined(__CYGWIN__))
 #include <Windows.h>
 #endif
 
@@ -115,7 +113,7 @@ public:
 		this->value += instructionLen + *(Ty*)(this->value + offsetToRead);
 	}
 
-#if _WINDOWS
+#if ((defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(WIN32) || defined(_WIN32) || defined(__WIN32)) && !defined(__CYGWIN__))
 
 	__declspec(noinline) bool is_valid(size_t szRegionMinSize = sizeof(void*)) const
 	{
