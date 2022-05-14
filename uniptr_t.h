@@ -17,22 +17,16 @@
 class uniptr_t
 {
 public:
-	template<size_t __size> struct any_size_t { uint8_t data[__size]; };
-
 	// CONSTRUCTORS
 	ALWAYS_INLINE uniptr_t() : value(0) {}
 	template<typename Ty>
 	ALWAYS_INLINE uniptr_t(const Ty value) : value((uintptr_t)value) {}
 
 	// SET
-	template<size_t len>
-	ALWAYS_INLINE void set(const void* src) { *(any_size_t<len>*)this->value = *(any_size_t<len>*)src; }
 	template<typename Ty>
 	ALWAYS_INLINE void set(const Ty value) { *(Ty*)this->value = value; }
 
 	// GET
-	template<size_t len>
-	ALWAYS_INLINE any_size_t<len> get() const { return *(any_size_t<len>*)this->value; }
 	template<typename Ty>
 	ALWAYS_INLINE Ty get() const { return *(Ty*)this->value; }
 	template<typename Ty>
@@ -125,6 +119,7 @@ public:
 
 	__declspec(noinline) bool is_valid(size_t szRegionMinSize = sizeof(void*)) const
 	{
+		if (!this->value) return false;
 		MEMORY_BASIC_INFORMATION mbi;
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
@@ -134,6 +129,7 @@ public:
 
 	__declspec(noinline) bool is_readable(size_t szRegionMinSize = sizeof(void*)) const
 	{
+		if (!this->value) return false;
 		MEMORY_BASIC_INFORMATION mbi;
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
@@ -147,6 +143,7 @@ public:
 
 	__declspec(noinline) bool is_writeable(size_t szRegionMinSize = sizeof(void*)) const
 	{
+		if (!this->value) return false;
 		MEMORY_BASIC_INFORMATION mbi;
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
@@ -159,6 +156,7 @@ public:
 
 	__declspec(noinline) size_t region_size() const
 	{
+		if (!this->value) return 0;
 		MEMORY_BASIC_INFORMATION mbi;
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) ? mbi.RegionSize : 0;
 	}
