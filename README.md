@@ -31,7 +31,6 @@ uniptr_t p4 = 0;
 
 // assign to any other numerical without casting
 uniptr_t p5 = 0x18401;
-// 
 ```
 
 Of course you can also do this vice versa - automatically cast `uniptr_t` to any pointer or numerical:
