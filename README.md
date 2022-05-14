@@ -1,5 +1,5 @@
 # uniptr_t - C++ Utility Class
-`uniptr_t` stands for univerasl pointer. It's a small C++ class wrapper for any pointer type. It removes the need to cast any pointer to any other pointer type, or to cast a numerical to a pointer type and vice versa.
+`uniptr_t` stands for univerasl pointer. It's a small C++ class wrapping any pointer type. It removes the need to cast any pointer to any other pointer type, or to cast a numerical to a pointer type and vice versa.
 
 The purpose of this library is to make working with pointers a lot a lot easier. But you still must be aware how memory and pointers work. Also be careful: `uniptr_t` is not always the best type to use when working with pointers or memory addresses.
 
