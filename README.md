@@ -87,7 +87,6 @@ size_t pointer_size = my_ptr.size(); // you can even do uniptr_t::size() since i
 // .relative_addr() and .to_relative_addr() are hard to explain but
 // as the name suggests, I use them to caluclate relative addresses
 // that an assembly instruction might be holding
-// if you don't understand, don't worry lol
 
 // and finally we have some windows specific functions
 // .is_valid() checks if the memory address uniptr_t is pointing to is valid (checks if it's commited memory)
