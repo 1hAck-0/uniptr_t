@@ -1,16 +1,16 @@
-#if !_UNIPTR_T_
-#define _UNIPTR_T_ 1
+#ifndef _UNIPTR_T_
+#define _UNIPTR_T_
 
 #if _MSC_VER
 #define ALWAYS_INLINE __forceinline
 #else
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
-#endif
+#endif // IF _MSC_VER
 
 #include <cstdint>
 #if ((defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(WIN32) || defined(_WIN32) || defined(__WIN32)) && !defined(__CYGWIN__))
 #include <Windows.h>
-#endif
+#endif // IF WINDOWS
 
 class uniptr_t
 {
@@ -55,10 +55,10 @@ public:
 	ALWAYS_INLINE void operator/=(const Ty value) { this->value /= (uintptr_t)value; }
 	template<typename Ty>
 	ALWAYS_INLINE void operator%=(const Ty value) { this->value %= (uintptr_t)value; }
-	ALWAYS_INLINE void operator++() { ++this->value; }
-	ALWAYS_INLINE void operator--() { --this->value; }
-	ALWAYS_INLINE void operator++(int) { this->value++; }
-	ALWAYS_INLINE void operator--(int) { this->value--; }
+	ALWAYS_INLINE uniptr_t operator++() { this->value++; return this->value; }
+	ALWAYS_INLINE uniptr_t operator--() { this->value--; return this->value; }
+	ALWAYS_INLINE uniptr_t operator++(int) { this->value++; return this->value - 1; }
+	ALWAYS_INLINE uniptr_t operator--(int) { this->value--; return this->value + 1; }
 
 	// BITWISE OPERATORS
 	template<typename Ty>
@@ -122,7 +122,7 @@ public:
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
 			mbi.State & MEM_COMMIT &&
-			mbi.Protect;
+			!(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD));
 	}
 
 	__declspec(noinline) bool is_readable(size_t szRegionMinSize = sizeof(void*)) const
@@ -132,11 +132,13 @@ public:
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
 			mbi.State & MEM_COMMIT &&
+			!(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) &&
 			mbi.Protect & (
 				PAGE_READONLY | PAGE_READWRITE |
 				PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE |
 				PAGE_GRAPHICS_READONLY | PAGE_GRAPHICS_READWRITE |
-				PAGE_GRAPHICS_EXECUTE_READ | PAGE_GRAPHICS_EXECUTE_READWRITE);
+				PAGE_GRAPHICS_EXECUTE_READ | PAGE_GRAPHICS_EXECUTE_READWRITE |
+				PAGE_WRITECOPY | PAGE_EXECUTE_WRITECOPY);
 	}
 
 	__declspec(noinline) bool is_writeable(size_t szRegionMinSize = sizeof(void*)) const
@@ -146,6 +148,7 @@ public:
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) &&
 			mbi.RegionSize >= szRegionMinSize &&
 			mbi.State & MEM_COMMIT &&
+			!(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) &&
 			mbi.Protect & (
 				PAGE_WRITECOPY | PAGE_READWRITE |
 				PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE |
@@ -159,12 +162,11 @@ public:
 		return VirtualQuery((void*)this->value, &mbi, sizeof(mbi)) ? mbi.RegionSize : 0;
 	}
 
-#endif // _WINDOWS
+#endif // IF WINDOWS
 
 private:
 	uintptr_t value;
 };
 
 #undef ALWAYS_INLINE
-#undef _WINDOWS
 #endif // _UNIPTR_T_
