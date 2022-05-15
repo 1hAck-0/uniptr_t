@@ -115,6 +115,18 @@ public:
 
 #if ((defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(WIN32) || defined(_WIN32) || defined(__WIN32)) && !defined(__CYGWIN__))
 
+#define PAGE_READ_ACCESS\
+	(PAGE_READONLY | PAGE_READWRITE | \
+	PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE |\
+	PAGE_GRAPHICS_READONLY | PAGE_GRAPHICS_READWRITE |\
+	PAGE_GRAPHICS_EXECUTE_READ | PAGE_GRAPHICS_EXECUTE_READWRITE |\
+	PAGE_WRITECOPY | PAGE_EXECUTE_WRITECOPY)
+
+#define PAGE_WRITE_ACCESS\
+	(PAGE_WRITECOPY | PAGE_READWRITE |\
+	PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE |\
+	PAGE_GRAPHICS_READWRITE | PAGE_GRAPHICS_EXECUTE_READWRITE)
+
 	__declspec(noinline) bool is_valid(size_t szRegionMinSize = sizeof(void*)) const
 	{
 		if (!this->value) return false;
@@ -133,12 +145,7 @@ public:
 			mbi.RegionSize >= szRegionMinSize &&
 			mbi.State & MEM_COMMIT &&
 			!(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) &&
-			mbi.Protect & (
-				PAGE_READONLY | PAGE_READWRITE |
-				PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE |
-				PAGE_GRAPHICS_READONLY | PAGE_GRAPHICS_READWRITE |
-				PAGE_GRAPHICS_EXECUTE_READ | PAGE_GRAPHICS_EXECUTE_READWRITE |
-				PAGE_WRITECOPY | PAGE_EXECUTE_WRITECOPY);
+			mbi.Protect & PAGE_READ_ACCESS;
 	}
 
 	__declspec(noinline) bool is_writeable(size_t szRegionMinSize = sizeof(void*)) const
@@ -149,10 +156,7 @@ public:
 			mbi.RegionSize >= szRegionMinSize &&
 			mbi.State & MEM_COMMIT &&
 			!(mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) &&
-			mbi.Protect & (
-				PAGE_WRITECOPY | PAGE_READWRITE |
-				PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE_READWRITE |
-				PAGE_GRAPHICS_READWRITE | PAGE_GRAPHICS_EXECUTE_READWRITE);
+			mbi.Protect & PAGE_WRITE_ACCESS;
 	}
 
 	__declspec(noinline) size_t region_size() const
