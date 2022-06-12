@@ -26,6 +26,7 @@
 
 #endif // IF WINDOWS
 
+template<typename Ty = void>
 class uniptr_t
 {
 public:
@@ -114,6 +115,10 @@ public:
 
 	// UTILITY
 	static constexpr ALWAYS_INLINE size_t size() { return sizeof(void*); }
+
+	ALWAYS_INLINE Ty* operator->() { return (Ty*)this->value; }
+	ALWAYS_INLINE const Ty* operator->() const { return (Ty*)this->value; }
+	ALWAYS_INLINE Ty operator*() const { return *(Ty*)this->value; }
 
 	template<typename Ty = uint32_t>
 	ALWAYS_INLINE uniptr_t relative_addr(size_t offsetToRead, size_t instructionLen) const
